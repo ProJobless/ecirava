@@ -1,0 +1,26 @@
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+
+// Sets the page title and meta data
+// Requires the site model to be loaded (it is autoloaded everypage by default)
+// Returns true if it doesn't fail
+if ( ! function_exists('is_url_live'))
+{
+    function is_url_live($url)
+    {
+        $CI =& get_instance();
+        // Set the page meta data
+        $temp = $CI->site->page($page);
+        if($temp)
+        {
+            $CI->data['page_title'] = $temp->title;
+            $CI->data['page_description'] = $temp->description;
+        }
+        // Set the site meta data
+        $CI->data['site_title'] = $CI->site->retrieve(array('site_title'));
+        return true;
+    }   
+
+    
+
+}

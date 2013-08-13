@@ -1,0 +1,16 @@
+<html>
+  	<head>
+	  	<title>Socket IO Test Page</title>
+	  	<script src="/socket.io/socket.io.js"></script>
+  	</head>
+  	<body>
+  		<h1>Socket IO Test Page</h1>
+	</body>
+	<script>
+        var socket = io.connect();
+        socket.on('message', function(data){
+		    console.log(data.message);
+		    socket.emit('test');
+		});
+	</script>
+</html>
