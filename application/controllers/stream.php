@@ -25,7 +25,7 @@ class Stream extends CI_Controller {
 		);
 
 		// Load JQuery - Enabled by default
-		$this->data['jquery']	= TRUE;
+		$this->data['jquery'] = TRUE;
 
 		// Load stream and post models
 		$this->load->model('streams');
@@ -45,7 +45,15 @@ class Stream extends CI_Controller {
 		if(!$this->data['is_logged_in']) { redirect('/', 'refresh'); }
 
 		// Turn on tooltip
-		$this->data['tooltip'] = true;
+		$this->data['tooltip'] = false;
+
+		// Additional JS for image tiling
+		$this->data['additional_js'] = '<script type="text/javascript" src="/resources/js/jquery.tiles-gallery.js"></script>
+		<script type="text/javascript" src="/resources/js/jquery.lightbox.js"></script>';
+
+		// Additional CSS for image tiling
+		$this->data['additional_css'] = '<link rel="stylesheet" type="text/css" href="/resources/css/jquery-tilesgallery.css" />
+		<link rel="stylesheet" type="text/css" href="/resources/css/themes/default/jquery.lightbox.css" />';
 
 		// Retrieve the user's info -- Consider only retrieving relevant data after development
 		$this->data['user'] = $this->users->user_info($this->data['user_id'], 'all');
@@ -77,6 +85,14 @@ class Stream extends CI_Controller {
 
 		// Turn on tooltip
 		$this->data['tooltip'] = true;
+
+		// Additional JS for image tiling
+		$this->data['additional_js'] = '<script type="text/javascript" src="/resources/js/jquery.tiles-gallery.js"></script>
+		<script type="text/javascript" src="/resources/js/jquery.lightbox.min.js"></script>';
+
+		// Additional CSS for image tiling
+		$this->data['additional_css'] = '<link rel="stylesheet" type="text/css" href="/resources/css/jquery-tilesgallery.css" />
+		<link rel="stylesheet" type="text/css" href="/resources/css/themes/default/jquery.lightbox.css" />';
 
 		// Set site and page meta data
 		set_page_data('stream');
@@ -142,6 +158,14 @@ class Stream extends CI_Controller {
 
 		// Turn on tooltip
 		$this->data['tooltip'] = true;
+
+		// Additional JS for image tiling
+		$this->data['additional_js'] = '<script type="text/javascript" src="/resources/js/jquery.tiles-gallery.js"></script>
+		<script type="text/javascript" src="/resources/js/jquery.lightbox.js"></script>';
+
+		// Additional CSS for image tiling
+		$this->data['additional_css'] = '<link rel="stylesheet" type="text/css" href="/resources/css/jquery-tilesgallery.css" />
+		<link rel="stylesheet" type="text/css" href="/resources/css/themes/default/jquery.lightbox.css" />';
 
 		// Retrieve the user's info -- Consider only retrieving relevant data after development
 		$this->data['user'] = $this->users->user_info($this->data['user_id'], 'all');

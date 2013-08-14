@@ -32,6 +32,7 @@ if($alert)      { echo '<script type="text/javascript" src="/resources/js/bootst
 
 
 <!--Additional JS-->
+<script rel="text/javascript" src="/resources/js/main.js"; /></script>
 <?PHP if(isset($additional_js)) { echo $additional_js; } ?> <!--Controller Specific Loading-->
 
 <!---Google Analytics-->
@@ -49,6 +50,3 @@ if($alert)      { echo '<script type="text/javascript" src="/resources/js/bootst
 
 </script>
 <!--Google Checkout-->
-
-<!--Custom JS that applies to the site-->
-<script rel="text/javascript" src="/resources/js/main.js"; /></script>

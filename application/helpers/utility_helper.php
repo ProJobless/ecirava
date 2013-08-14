@@ -67,10 +67,24 @@ if ( ! function_exists('nls2p'))
 
 // Turns a PHP array into one ready to paste into JS
 // e.g. ['tag1', 'tag2', 'tag3']
-if( ! function_exists('php_to_js_array'))
+if ( ! function_exists('php_to_js_array'))
 {
     function php_to_js_array($array)
     {
         return "['".implode($array, "','")."']";
     }
 }
+
+// Retrieves the extension of a file given its filename
+if ( ! function_exists('get_ext'))
+{
+    function get_ext($file_name)
+    {
+        $ext = end(explode(".", $file_name));
+
+        return $ext;
+    }
+}
+
+
+

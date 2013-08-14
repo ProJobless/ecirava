@@ -47,7 +47,7 @@ class User extends CI_Controller {
 		// Load Additional JS Libraries
 		$this->data['additional_js'] = '<script src="/resources/js/jquery.uploadifive.min.js" type="text/javascript"></script>';
 
-		// Load Additoinal CSS
+		// Load Additional CSS
 		$this->data['additional_css'] = '<link rel="stylesheet" type="text/css" href="/resources/css/uploadifive.css">';
 
 		// Retrieve the user's account information. Print and exit on error.
@@ -324,16 +324,15 @@ class User extends CI_Controller {
     // Echo's the target user's id to refresh upon completion/verify
     public function update_profile_pic()
     {
-
 	    // Get the user's ID from post or from the login session
 	    // Changing the profile picture via POST requires admin privilege
 	    $user_id = $this->input->post('$user_id');
-	    if(empty($user_id) || !$this->data['admin'])
+	    if(($user_id != $this->data['user_id'] || empty($user_id)) && !$this->data['admin'])
 	    {
 	    	$user_id = $this->data['user_id'];
 	    }
 
-	    // Requires the Wideimage library
+	    // Requires the Wideimage library !!!! MAKE THIS AN ACTUAL LIBRARY AT ONE POINT !!!!
 	    require_once($_SERVER['DOCUMENT_ROOT'].'/resources/php/wideimage/WideImage.php');
 
 	    // Set the upload directory

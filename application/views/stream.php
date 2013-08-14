@@ -53,5 +53,6 @@
 	var total_num_following = <?PHP echo $stream['following_num']; ?>;
 	var stream_id = <?PHP echo $stream['id']; ?>;
 	load_stream_thumbs('#stream_box', 9, 0, stream_id);
+	window.onLoad = tile_images();
 	</script>
 </html>

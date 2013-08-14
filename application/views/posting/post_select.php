@@ -12,7 +12,17 @@
 		<div class="row">
 			<h2 class="pull_center">Select Post Type</h2>
 	    	<div id="" class="span6 offset3 post_type">
+	    		<a href="/posting/text"><h1>Share a Thought</h1></a>
+			</div>
+	  	</div>
+	  	<div class="row">
+	    	<div id="" class="span6 offset3 post_type">
 	    		<a href="/posting/link"><h1>Share a Link</h1></a>
+			</div>
+	  	</div>
+	  	<div class="row">
+	    	<div id="" class="span6 offset3 post_type">
+	    		<a href="/posting/images"><h1>Share Images</h1></a>
 			</div>
 	  	</div>
 	</div>
@@ -20,7 +30,7 @@
 	<?PHP echo $this->load->view('head'); ?> <!--Load CSS and JS after body to improve page performance-->
 	<style>
 	.post_type {
-		margin-top: 10px;
+		margin-bottom: 20px;
 		background-color: #439e43;
 		color: #FFF;
 		text-align: center;

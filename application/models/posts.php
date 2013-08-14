@@ -6,6 +6,9 @@ class Posts extends CI_Model {
     {
         // Call the Model constructor
         parent::__construct();
+
+        // Load the post helper
+        $this->load->helper('post');
     }
 
     // Retireves the value of a about a post type given a post type
@@ -127,7 +130,7 @@ class Posts extends CI_Model {
             foreach ($tags as $tag) 
             {
                 $tag = strtolower($tag);
-                $tag = htmlspecialchars($tag);
+                $tag = htmlspecialchars($tag);;
 
                 if(in_array($tag, $banned_tags)) { continue; }
                 if(strlen($tag) < 2 || strlen($tag) > 100) { continue; }
@@ -195,27 +198,31 @@ class Posts extends CI_Model {
             else if($primary->num_rows() == 1) { $primary = $primary->row_array(); }
             else { $primary = $primary->result_array(); }
 
-            $table_2 = 'post_'.$primary['type'];
-            $secondary = $this->db->get_where($table_2, array('post_id' => $id));
-            
-            // This means it is a repost so we have to look up where to find the secondary post data
-            if($secondary->num_rows() == 0) 
-            { 
-                $this->db->select($table_2.'.*');
-                $this->db->from($table_2);
-                $this->db->join('posts', $table_2.'.post_id = posts.repost_id');
-                $this->db->where('posts.id', $id);
-                $secondary = $this->db->get();
-            }
-            if($secondary->num_rows() == 1) { $secondary = $secondary->row_array(); }
-            else { $secondary = $secondary->result_array(); }
-
-            foreach ($secondary as $key => $value) 
+            // Text type posts do not have secondary data
+            if($primary['type'] != 'text')
             {
-                if($key == 'post_id') { continue; }
-                $primary[$key] = $value;
-            }
+                $table_2 = 'post_'.$primary['type'];
+                $secondary = $this->db->get_where($table_2, array('post_id' => $id));
+                
+                // This means it is a repost so we have to look up where to find the secondary post data
+                if($secondary->num_rows() == 0) 
+                { 
+                    $this->db->select($table_2.'.*');
+                    $this->db->from($table_2);
+                    $this->db->join('posts', $table_2.'.post_id = posts.repost_id');
+                    $this->db->where('posts.id', $id);
+                    $secondary = $this->db->get();
+                }
+                if($secondary->num_rows() == 1) { $secondary = $secondary->row_array(); }
+                else { $secondary = $secondary->result_array(); }
 
+                foreach($secondary as $key => $value) 
+                {
+                    if($key == 'post_id') { continue; }
+                    $primary[$key] = $value;
+                }
+            }
+            
             $return_array[] = $primary;
         }
         return $return_array;
@@ -287,8 +294,10 @@ class Posts extends CI_Model {
     // Deletes a post permanently, and all associated content
     function delete($post_id)
     {
-        // Get the post type
+        // Get the post info
         $post_type = $this->posts->post_info($post_id, 'type');
+        $time = $this->posts->post_info($post_id, 'created_on');
+        $repost_id = $this->posts->post_info($post_id, 'repost_id');
 
         // Get author ID
         $author_id = post_author_id($post_id);
@@ -306,6 +315,25 @@ class Posts extends CI_Model {
         $this->db->delete($table, array('post_id' => $post_id));
 
         // Add specifc content removal for posts types
+        // Removing Image Posts
+        if($post_type == 'images')
+        {
+            // If the post is a repost you don't need to delete additional data
+            if($repost_id != 0) { return; }
+
+            $upload_path = upload_path($time);
+            $images = $this->posts->get_images($post_id);
+            // Deletes all the images
+            foreach($images as $img)
+            {
+                unlink($_SERVER['DOCUMENT_ROOT'].$upload_path.$img);
+                unlink($_SERVER['DOCUMENT_ROOT'].$upload_path.'fs_'.$img);
+                unlink($_SERVER['DOCUMENT_ROOT'].$upload_path.'sm_'.$img);
+                unlink($_SERVER['DOCUMENT_ROOT'].$upload_path.'tb_'.$img);
+            }
+            // Delete from the DB
+            $this->db->delete('images', array('post_id' => $post_id));
+        }
     }
 
     // Returns the an array of data about a specific post
@@ -343,6 +371,51 @@ class Posts extends CI_Model {
         }
     }
 
+    // Sends back and array with the image names of the post
+    // Takes an optional parameter to return the name of a certain size
+    function get_images($post_id, $type = "full")
+    {
+
+        $prefix = array(
+            'full' => '',
+            'post' => 'fs_',
+            'thumb' => 'tb_',
+            'thumbnail' => 'tb_',
+            'small' => 'sm_'
+            );
+
+        // Fix bad inputs
+        if(!array_key_exists($type, $prefix))
+        {
+            $type = 'full';
+        }
+
+        $this->db->select('img');
+        $this->db->from('images');
+        $this->db->where('post_id', $post_id);
+        $images = $this->db->get();
+
+        if($images->num_rows() == 1)
+        {
+            $images = $images->row();
+            $images = $prefix[$type].$images->img;
+            return array($images);
+        }
+        else
+        {
+            $images = $images->result();
+        }
+
+        $img_names= array();
+        foreach($images as $image)
+        {
+            $name = $prefix[$type].$image->img;
+            array_push($img_names, $name);
+        }
+
+        return $img_names;
+    }
+
     // Formats the posts for output to the stream
     // Returns an array of strings, each index a string of the post
     // Accepts an array of ID's or a single ID
@@ -351,11 +424,12 @@ class Posts extends CI_Model {
         // Requires the user helper to format the profile picture
         $this->load->helper('user');
 
+
         // Load the users model
         $this->load->model('users');
 
         if(!is_array($posts)) { $posts = array($posts); }
-        $post_array = array();;
+        $post_array = array();
 
         foreach($posts as $post)
         {      
@@ -434,7 +508,7 @@ class Posts extends CI_Model {
                         '.$reposted_icon.'
                     </div>
                     <div class="link_src">
-                        <a href="#">Permanlink to post</a>
+                        <a href="#">Perma-link to post</a>
                     </div>';
 
             // The footer of each post
@@ -455,12 +529,21 @@ class Posts extends CI_Model {
                         </div>
                     </div>'; 
 
-            if($post['type'] == 'link')
+            if($post['type'] == 'text')
+            {
+                $return_string = generate_text_post($post, $pic, $reposted_icon);
+            }
+            else if($post['type'] == 'link')
             {
                 // Ignore the header, link type posts have a unique header that doesn't link to the post but to the link itself
                 // It therefore needs the $pic and $reposted_icon variables passed to it
                 $header = "";
                 $return_string = generate_link_post($post, $pic, $reposted_icon);
+            }
+            else if($post['type'] == 'images')
+            {
+                $images = $this->posts->get_images($repost_id);
+                $return_string = generate_images_post($post, $images, $pic, $reposted_icon);
             }
 
             // Assemble the post

@@ -744,6 +744,11 @@ cursor: pointer;
 	background-color: #000;
 }
 
+.stream_img {
+	border: 5px #FFF solid;
+	margin: 15px 35px!important;
+}
+
 .info_box .tooltip.in {
   opacity: 1;
   filter: alpha(opacity=100);
@@ -759,6 +764,10 @@ cursor: pointer;
 
 .red_bg {
 	background-color: #DB3D3D!important;
+}
+
+.blue_bg {
+	background-color: #6FA19C;
 }
 
 #main {

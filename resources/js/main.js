@@ -1,13 +1,13 @@
 // To be done on everypage regardless
 $(function() {
 	$('.hidden').hide();
-	$('.tooltip_me').tooltip();
 });
 
 // Variable Locks (variables used to prevent repeated or conflicting AJAX calls; e.g. double tapping the subscribe button)
 locks = {
 	follow: false,
-	favorite: false
+	favorite: false,
+	submit: false
 };
 
 // Misc Variables
@@ -18,6 +18,29 @@ var success_message = {
 		'email': '<strong>Success!</strong> Check your new email address to confirm change',
 		'profile_pic': '<strong>Success!</strong> Your picture has been updated.'
 	};
+
+// /views/stream.php; /my_stream.php
+// Tiles the image posts
+function tile_images()
+{
+	// WHEN THIS IS UPGARDED GO BACK TO TILING
+
+	// $('.images').tilesGallery({
+	// 	width: 650,
+	// 	// height: 500,
+	// 	tileMinHeight: 250,
+	// 	margin: 10,
+	// 	captionOnMouseOver: false,
+	// 	verticalAlign: 'top',
+	// 	horizontalAlign: 'center',
+	// 	callback: function() {
+	// 		console.log('Tiled');
+	// 		$('.lightbox').lightbox();
+	// 	}
+	// })
+
+	$('.lightbox').lightbox();
+}
 
 // views/account.php; admin/user_admin.php
 // Handles dispaying the error or success message
@@ -133,7 +156,7 @@ function favorite(ele, post_id)
 
 // view/account.php
 // Sets up the profile uplaoder script
-function uploadifive()
+function uploadifive_account()
 {
     $('#file_upload').uploadifive({
     	'auto'		   :  true,
@@ -163,6 +186,42 @@ function uploadifive()
             now = new Date(); // Forces image to be refreshed from the server when appended
             $('#account_profile_pic').css('background-image', 'url("/resources/profile_pics/'+data+'.png?'+now+'")');
             update_complete('Success!', 'profile_pic');
+         }
+    });
+}
+
+// view/posting/post_images.php
+// Sets up the images uploader script
+function uploadifive_images()
+{
+    $('#file_upload').uploadifive({
+    	'auto'		   :  true,
+        'uploadScript' : '/posting/upload_image',
+        'buttonClass'  : 'hidden',
+        'buttonText'   : 'Add Images',
+        'width'		   :  220,
+        'queueID'	   : 'upload_images_area',
+        'itemTemplate' : '<div class="uploadifive-queue-item" style="display:none;"></div>',
+        'fileSizeLimit': '5MB',
+        'fileType'     : 'image',
+        'multi'        :  true, // No multiple uploads
+        'queueSizeLimit' : 0,	// Prevents stupid alerts if you try to change your pic very rapidly twice or more times
+        'simUploadLimit' : 2,	// One at a time since you're just changing your profile picture
+        'removeCompleted' : true,
+
+        'onError'      : function(errorType) { 
+        	console.warn('Error Uploading File: ' + errorType); 
+        	update_complete(data, 'profile_pic');
+        },
+        'onAddQueueItem' : function(file) { console.log('The file ' + file.name + ' was added to the queue.'); },
+        'onUpload'     : function(filesToUpload) { console.log(filesToUpload + ' files will be uploaded.'); },
+        'onUploadFile'     : function(file) { console.log(file.name + ' files will be uploaded.'); },
+         'onUploadComplete' : function(file, data) {
+         	// Log it
+            console.log('The file ' + file.name + ' uploaded successfully.');
+            console.log('Data Retrieved: ' + data);
+            // Add the preview back to your page
+            $('<li class="unselectable img_li" src="'+data+'"><img src="/resources/temp_uploads/thumb_' + data + '" class="image_upload" /></li>').appendTo('#sortable1');
          }
     });
 }

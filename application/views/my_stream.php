@@ -45,6 +45,7 @@
 	<script>
 	var total_num_following = <?PHP echo $stream['following_num']; ?>;
 	load_stream_thumbs();
+	window.onLoad = tile_images();
 	</script>
 
 	<!--Custom CSS for this page, should be added to main.css after development-->

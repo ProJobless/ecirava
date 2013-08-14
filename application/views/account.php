@@ -97,7 +97,7 @@
 	<?PHP echo $this->load->view('head'); ?> <!--Load CSS and JS after body to improve page performance-->
 	<!--Custom JS for this page. CANNOT be added to main.js after development-->
 	<script>
-	window.onLoad = uploadifive();
+	window.onLoad = uploadifive_account();
 
 	// Sends the user id (username or email) and password to the server for validation
 	// Returns an error if it fails and returns them to the previous page on success
