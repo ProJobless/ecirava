@@ -314,13 +314,13 @@ class Posts extends CI_Model {
         $table = 'post_'.$post_type;
         $this->db->delete($table, array('post_id' => $post_id));
 
+        // If the post is a repost you don't need to delete additional data
+        if($repost_id != 0) { return; }
+
         // Add specifc content removal for posts types
         // Removing Image Posts
         if($post_type == 'images')
         {
-            // If the post is a repost you don't need to delete additional data
-            if($repost_id != 0) { return; }
-
             $upload_path = upload_path($time);
             $images = $this->posts->get_images($post_id);
             // Deletes all the images
@@ -334,6 +334,9 @@ class Posts extends CI_Model {
             // Delete from the DB
             $this->db->delete('images', array('post_id' => $post_id));
         }
+
+        // Delete all reposts of the data
+        $this->db->delete('posts', array('repost_id' => $post_id));
     }
 
     // Returns the an array of data about a specific post
@@ -501,7 +504,7 @@ class Posts extends CI_Model {
             else { $date = date('F j, Y, g:i a',$post['created_on']); }
 
             // The header of each post
-            $header = '<div id="'.$post['id'].'" class="span9 stream_post">
+            $header = '<div id="p_'.$post['id'].'" class="span9 stream_post">
                     '.$pic.'
                     <div class="post_title">
                         <a href="#">'.$post['title'].'</a>
@@ -513,14 +516,16 @@ class Posts extends CI_Model {
 
             // The footer of each post
             $footer = '<div class="post_meta">
-                                <div class="pull-left"><a href="#" style="float:left">'.$post['num_comments'].' Comments</a></div>
-                                <div class="pull-right unselectable">'.$favorite_button.' '.$reblog_button.' <h4>Comment</h4></div>
+                                <div class="pull-left"><a href="javascript:void(0)" onclick="show_comments(this, '.$repost_id.')" style="float:left">'.$post['num_comments'].' Comments</a></div>
+                                <div class="pull-right unselectable">'.$favorite_button.' '.$reblog_button.' <h4 onclick="comment(this, '.$post["id"].', 0)">Comment</h4></div>
                             </div>
                             <div style="clear:both;"></div>
-                            <div class="comments">
+                            <div id="comments_'.$post["id"].'" class="comments">
                             </div>
                             <div class="load_comments">
                             </div>
+                            <div style="clear:both;"></div>
+                            <div style="clear:both;"></div>
                             <div class="post_meta">
                                 <div class="pull-left"><a href="#">Full Post</a></div>
                                 <div class="pull-right unselectable">'.$date.'</div>
@@ -551,6 +556,16 @@ class Posts extends CI_Model {
         }
 
         return $post_array;
+    }
+
+    // Returns true if the post exists
+    function post_exists($post_id)
+    {
+        $this->db->from('posts');
+        $this->db->where('id', $post_id);
+
+        if($this->db->count_all_results() == 1) { return true; }
+        else { return false; }
     }
 }
 

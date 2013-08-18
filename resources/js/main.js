@@ -7,7 +7,8 @@ $(function() {
 locks = {
 	follow: false,
 	favorite: false,
-	submit: false
+	submit: false,
+	comment: false
 };
 
 // Misc Variables
@@ -285,3 +286,136 @@ function change_tooltip_color(color) {
     $('.tooltip.bottom .tooltip-arrow').css('border-bottom-color', color);
 }
 
+// Creates a comment box for a user to submit a comment 
+function comment(ele, post_id, comment_id)
+{
+	// Remove other comment boxes
+	$('#cb_'+post_id).remove();
+
+	// Because JS is the worst
+	post_id = post_id.toString();
+
+	// Create the new comment element
+	comment_box = '<div id="cb_'+post_id+'"class="comment_box">'
+                       	+'<textarea id="ta_'+post_id+'" class="trans_bg"></textarea>'
+                        +'<h4 onclick="submit_comment(this, '+post_id+','+comment_id+')" class="comment_submit">Submit</h4>'
+                        +'<h4 id="cm_'+post_id+'" class="comment_message"></h4>'
+                        +'<h4 id="rc_'+post_id+'" class="remaining_chars">500</h4>'
+                    +'</div>';
+    // If comment_id == 0 then it is the original comment post
+    // Special styling rules apply for positioning
+    if(comment_id == 0)
+    {
+    	$(ele).parent().parent().next().after(comment_box);
+   		$('#ta_'+post_id).autogrow().css('padding-top', '5px');
+    }
+    else
+    {
+    	$(ele).after(comment_box);
+    	$('#ta_'+post_id).autogrow().css('padding-top', '5px').css('margin-left', '0px');
+    }
+    char_count($('#ta_'+post_id), 500);
+
+}
+
+// Makes a textarea keep count of it's characters and autogrow
+// Used with comments, otherwise the display of the count makes no sense
+function char_count(ele, max_char)
+{
+    $(ele).keyup(function()
+    {
+        $(this).siblings('.remaining_chars').css('color', '#FFF');
+        $(this).css('border', '1px #FFF solid');
+        $(this).siblings('.remaining_chars').html(max_char - this.value.length);
+        if(max_char - this.value.length <= 0)
+        {
+            $(this).siblings('.remaining_chars').css('color', 'red');
+        }
+    });
+}
+
+// Submits a comment for a post
+function submit_comment(ele, post_id, comment_id)
+{
+    // Only one comment submit request at a time
+    if(locks['comment'])
+    {
+        console.log('User tried to submit a new comment too soon');
+        $('#cm_'+post_id).addClass('error').html('You\'re current comment is still pending');
+    }
+    locks[comment] = true;
+    // Retrieve the comment content
+    content = $('#ta_'+post_id).val();
+    $.post('/comment/new_comment', {post_id: post_id, content: content, reply_id: comment_id }).done(function(data) {
+        if(data == 'Success!')
+        {
+            console.log('Comment submitted successfully for post: '+post_id);
+            $('#cm_'+post_id).removeClass('error').html('Success!');
+            $('#ta_'+post_id).css('border', '1px #51A351 solid');
+            // Fade the post out and remove it
+            $('#cb_'+post_id).slideUp	(3000, function() { $('#cb_'+post_id).remove(); });
+        }
+        else
+        {
+            console.log(data);
+            $('#cm_'+post_id).addClass('error').html(data);
+            $('#ta_'+post_id).css('border', '1px red solid');
+        }
+        locks[comment] = false;
+    });
+}
+
+// Formats the date into "August 4th, 2013" format given a date object
+// Returns a string
+function format_date(date)
+{
+	months = new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+	month = months[date.getMonth()];
+
+	day = date.getDate();
+	day = day.toString();
+
+	suffix = day.substr(-1);
+	if(suffix == '1') { suffix = 'st'; }
+	else if(suffix == '2') { suffix = 'nd'; }
+	else if(suffix == '3') { suffix = 'rd'; }
+	else { suffix = 'th'; }
+	// Exceptions
+	if( day == '11' || day == '12' || day == '13') { suffix = 'th'; }
+
+	year = date.getFullYear().toString();
+
+	return month+' '+day+suffix+',&nbsp;&nbsp;'+year;
+}
+
+// Loads and displays the comments
+function show_comments(ele, post_id, offset)
+{
+	// Disable repearted calls
+	$(ele).attr('onclick', '');
+	// Set the text to a loading bar
+	$(ele).html('<img src="/resources/img/ajax-loader.gif" />');
+
+	// Make the AJAX call
+	$.post('/comment/show_comments', { post_id: post_id, offset: offset}).done(function(data) {
+		console.log(data);
+		data = JSON.parse(data);
+		$.each(data, function(index, comment) {
+			date = new Date(Number(comment.created_on)*1000);
+			date = format_date(date);
+			$('#comments_'+post_id).append('<div id="com_'+comment.id+'" class="comment">'+
+                '<img src="/resources/profile_pics/'+comment.author_id+'.png" />'+
+                '<div class="content trans_bg">'+
+                comment.content+
+                '</div>'+
+                '<h4 class="date post_meta">'+date+'</h4>'+
+                '<h4 class="post_meta button" onclick="comment(this, '+comment.post_id+', '+comment.id+')">Reply</h4>'+
+            '</div>'+
+            '<div style="clear:both;></div>');
+		});
+		$(ele).html('');
+	});
+
+	// Add a button to load more posts
+	$('#lc_'+post_id).append('img');
+}

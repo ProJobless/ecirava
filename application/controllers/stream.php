@@ -49,7 +49,8 @@ class Stream extends CI_Controller {
 
 		// Additional JS for image tiling
 		$this->data['additional_js'] = '<script type="text/javascript" src="/resources/js/jquery.tiles-gallery.js"></script>
-		<script type="text/javascript" src="/resources/js/jquery.lightbox.js"></script>';
+		<script type="text/javascript" src="/resources/js/jquery.lightbox.js"></script>
+		<script type="text/javascript" src="/resources/js/autogrow.js"></script>';
 
 		// Additional CSS for image tiling
 		$this->data['additional_css'] = '<link rel="stylesheet" type="text/css" href="/resources/css/jquery-tilesgallery.css" />
@@ -78,6 +79,22 @@ class Stream extends CI_Controller {
 		$this->load->view('my_stream', $this->data);
 	}
 
+	// Just loads a view for testing purposes
+	public function test()
+	{
+		// To get rid of errors
+		$this->data['site_title'] = "Testing Stream";
+		$this->data['stream']['id'] = 7;
+		$this->data['stream']['following_num'] = 4;
+		// Additional JS for image tiling
+		$this->data['additional_js'] = '<script type="text/javascript" src="/resources/js/jquery.tiles-gallery.js"></script>
+		<script type="text/javascript" src="/resources/js/jquery.lightbox.js"></script>
+		<script type="text/javascript" src="/resources/js/autogrow.js"></script>';
+		//
+
+		$this->load->view('test_stream', $this->data);
+	}
+
 	// Returns the stream via the stream's title or ID
 	public function view($title)
 	{
@@ -88,7 +105,8 @@ class Stream extends CI_Controller {
 
 		// Additional JS for image tiling
 		$this->data['additional_js'] = '<script type="text/javascript" src="/resources/js/jquery.tiles-gallery.js"></script>
-		<script type="text/javascript" src="/resources/js/jquery.lightbox.min.js"></script>';
+		<script type="text/javascript" src="/resources/js/jquery.lightbox.min.js"></script>
+		<script type="text/javascript" src="/resources/js/autogrow.js"></script>';
 
 		// Additional CSS for image tiling
 		$this->data['additional_css'] = '<link rel="stylesheet" type="text/css" href="/resources/css/jquery-tilesgallery.css" />
@@ -161,7 +179,8 @@ class Stream extends CI_Controller {
 
 		// Additional JS for image tiling
 		$this->data['additional_js'] = '<script type="text/javascript" src="/resources/js/jquery.tiles-gallery.js"></script>
-		<script type="text/javascript" src="/resources/js/jquery.lightbox.js"></script>';
+		<script type="text/javascript" src="/resources/js/jquery.lightbox.js"></script>
+		<script type="text/javascript" src="/resources/js/autogrow.js"></script>';
 
 		// Additional CSS for image tiling
 		$this->data['additional_css'] = '<link rel="stylesheet" type="text/css" href="/resources/css/jquery-tilesgallery.css" />
