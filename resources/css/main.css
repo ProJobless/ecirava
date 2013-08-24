@@ -763,7 +763,7 @@ cursor: pointer;
 }
 
 .red_bg {
-	background-color: #DB3D3D!important;
+	background-color: #DB3D3D!important; /*#B03E3E8*/
 }
 
 .blue_bg {
@@ -821,27 +821,51 @@ cursor: pointer;
     margin-bottom: 20px;
 }
 .comment img {
-    width: 100px;
-    height: 100px;
+    width: 65px;
+    height: 65px;
     margin: 10px;
-    margin-bottom: 7px;
+    margin-bottom: 20px;
     float: left;
     cursor: pointer;
     text-align: center;
     border: 5px #FFF solid;
+    box-shadow: 0px 0px 5px 5px #111;
 }
 .comment .post_meta.date {
-    float: left;
+    float: right;
     margin: 0px;
 }
-.comment .post_meta.button {
-    float: right;
-    margin: 0px 15px;
+.comment .username {
+    float: left;
     cursor: pointer;
+    margin: 0px;
+}
 
+.comment .post_meta.button {
+	color: #B03E3E;
+	position: relative;
+	display: inline-block;
+	top: 90px;
+	left: -60px;
+	cursor: pointer;
+	margin: 0px;
+	z-index: 10090;
+}
+
+.comment .comment_meta {
+	float: left;
+	min-width: 548px;
+	color: #F7C972;
+}
+.comment .comment_meta h4 {
+	color: #F7C972;
+}
+
+.comment .comment_meta a {
+	color: #F7C972;
 }
 .comment .content {
-    min-height: 115px;
+    min-height: 75px;
     margin-left: 0px;   
     color: #AAA;
     padding: 7px;
@@ -850,6 +874,22 @@ cursor: pointer;
 
 #main {
 	margin-bottom: 100px;
+}
+
+.load_more {
+	margin: 10px auto;
+}
+
+.load_more h4:hover {
+	box-shadow: 0px 0px 10px 5px #111;
+}
+
+.load_more h4 {
+	margin: auto;
+	display: inline-block;
+	padding: 5px;
+	cursor: pointer;
+	float: right;
 }
 
 .repost_icon {

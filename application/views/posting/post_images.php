@@ -135,6 +135,7 @@
 				images.push($(this).attr('src'));
 				// console.log($(this).attr('src'));
 			});
+			console.log(images);
 
 			// Get all the tags and make an array from them
 			var post_tags = new Array();
@@ -142,7 +143,7 @@
 				post_tags[index] = $(this).val();
 			});
 
-			$('#submit').html('Posting...');
+			$('#submit_images').html('Posting...');
 
         	$.post("/posting/submit_images", { title: title, tags: post_tags, content: text, images: images }).done(function(data) { 
         		console.log('Form submitted successfully!');
@@ -156,7 +157,7 @@
         		else
         		{
         			$('#error').show().html("").html('<strong>Oops!</strong> '+data); // Show the error box with appropriate error
-        			$('#submit').html('Submit');
+        			$('#submit_images').html('Submit');
         			locks[submit] = false;
         		}
         		$('#busy').hide();

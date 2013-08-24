@@ -207,7 +207,7 @@ function uploadifive_images()
         'fileType'     : 'image',
         'multi'        :  true, // No multiple uploads
         'queueSizeLimit' : 0,	// Prevents stupid alerts if you try to change your pic very rapidly twice or more times
-        'simUploadLimit' : 2,	// One at a time since you're just changing your profile picture
+        'simUploadLimit' : 1,	// One at a time to help preserve ordering
         'removeCompleted' : true,
 
         'onError'      : function(errorType) { 
@@ -311,8 +311,8 @@ function comment(ele, post_id, comment_id)
     }
     else
     {
-    	$(ele).after(comment_box);
-    	$('#ta_'+post_id).autogrow().css('padding-top', '5px').css('margin-left', '0px');
+    	$(ele).parent().after(comment_box);
+    	$('#ta_'+post_id).autogrow().css('padding-top', '5px');
     }
     char_count($('#ta_'+post_id), 500);
 
@@ -405,11 +405,14 @@ function show_comments(ele, post_id, offset)
 			date = format_date(date);
 			$('#comments_'+post_id).append('<div id="com_'+comment.id+'" class="comment">'+
                 '<img src="/resources/profile_pics/'+comment.author_id+'.png" />'+
+				'<h4 class="post_meta button unselectable" onclick="comment(this, '+comment.post_id+', '+comment.id+')">Reply</h4>'+
                 '<div class="content trans_bg">'+
+                '<div class="comment_meta">'+
+           		    '<h4 class="date post_meta">'+date+'</h4>'+
+           		    '<h4 class="username post_meta"><a href="/stream/view/'+comment.author_id+'">'+comment.username+'</a></h4>'+
+           		'</div>'+
                 comment.content+
                 '</div>'+
-                '<h4 class="date post_meta">'+date+'</h4>'+
-                '<h4 class="post_meta button" onclick="comment(this, '+comment.post_id+', '+comment.id+')">Reply</h4>'+
             '</div>'+
             '<div style="clear:both;></div>');
 		});
@@ -418,4 +421,20 @@ function show_comments(ele, post_id, offset)
 
 	// Add a button to load more posts
 	$('#lc_'+post_id).append('img');
+}
+
+// Loads the next 10 posts
+function load_more_posts(type)
+{
+	$.post("/stream/load_posts", {stream_id: stream_id, offset: offset, type: type}).done(function(data){
+		$('#content').append(data);
+		// Change the offset
+		offset += 10;
+		// If we've reached the end of the stream remove the 'load more posts button'
+		if(offset > total_posts)
+		{
+			$('.load_more').html('<h4 style="text-align:center;">End of Stream</h4>');
+			console.log('End of stream reached');
+		}
+	});
 }

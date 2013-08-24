@@ -70,7 +70,7 @@ class Comment extends CI_Controller {
 		if(empty($post_id)) { echo 'No post ID sent'; return; }
 		if(empty($offset)) { $offset = 0; }
 
-		$comments = $this->comments->get_post_comments($post_id);
+		$comments = $this->comments->get_post_comments($post_id, true);
 
 		echo json_encode($comments);
 	}

@@ -45,7 +45,7 @@
 		  					<div class="span2"><h3>followers</h3></div>
 		  				</div>
 		  				<div class="row">
-		  					<div class="span1 num"><h3><?PHP echo number_format($stream['num_posts']); ?></h3></div>
+		  					<div class="span1 num"><h3><?PHP echo number_format($stream['total_posts']); ?></h3></div>
 		  					<div class="span2"><h3>posts</h3></div>
 		  				</div>
 	  	  			</div>

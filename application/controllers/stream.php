@@ -61,10 +61,11 @@ class Stream extends CI_Controller {
 
 		// Set site and page meta data
 		set_page_data('stream');
-		$this->data['stream_title'] = $this->data['user']['username']."'s Stream";
 
 		// Retrieve the stream data
 		$this->data['stream'] = $this->streams->stream_info($this->data['user_id'], 'all');
+		$this->data['stream']['total_posts'] = $this->posts->count_posts(array('author_id' => $this->data['user_id']));
+		$this->data['stream']['title'] = 'My Stream';
 
 		// Retrieve number of streams you are following
 		$this->data['stream']['following_num'] = $this->streams->count_following($this->data['user_id'], 'active');
@@ -77,6 +78,54 @@ class Stream extends CI_Controller {
 		$this->data['stream_posts'] = $this->streams->retrieve_posts($following_ids, 10, 0);
 
 		$this->load->view('my_stream', $this->data);
+	}
+
+	// Sends back a formatted post string when called by AJAX 
+	public function load_posts()
+	{
+		// Check if it is AJAX
+		if(!IS_AJAX) { echo 'AJAX calls only.'; return; }
+
+		// Retrieve from $_POST
+		$stream_id = $this->input->post('stream_id');
+		$offset = $this->input->post('offset');
+		$type = $this->input->post('type');
+
+		// Check for empty $_POST data
+		if(empty($stream_id)) { $stream_id = $this->data['user_id']; }
+		if(empty($offset)) { echo 'No offset specified'; return; }
+		if(empty($type))	{ echo 'No type specified'; return; }
+
+		// Make sure the user isn't loading posts from streams they do not have permission to view
+		if(!permission_to_view($this->data['user_id'], $stream_id)) { echo 'You do not have permission to view'; return; }
+
+		// Scoping
+		$ids;
+		$posts;
+
+		if($type == 'my_stream')
+		{
+			// Retrieve an array of ids you are following
+			$ids = $this->streams->return_following($this->data['user_id'], 500, 0, 'active');
+			$ids[] = $this->data['user_id']; // Add yourself, makes it an array so pics are not shown
+			$posts = $this->streams->retrieve_posts($ids, 10, $offset);
+		}
+		else if($type =='stream')
+		{
+			$posts = $this->streams->retrieve_posts($stream_id, 10, $offset);
+		}
+		else if($type == 'favorites')
+		{
+			$posts = $this->streams->retrieve_favorites($this->data['user_id'], 10, $offset);
+		}
+		
+		$return_string = "";
+		foreach($posts as $post)
+		{
+			$return_string = $return_string.$post;
+		}
+
+		echo $return_string;
 	}
 
 	// Just loads a view for testing purposes
@@ -134,7 +183,7 @@ class Stream extends CI_Controller {
 		// Retrieve number of streams that are following
 		$this->data['stream']['following_num'] = $this->streams->count_followers($title);
 		$this->data['stream']['num_subscribers'] = $this->streams->count_subscribers($title, 'all');
-		$this->data['stream']['num_posts'] = $this->streams->count_posts($title);
+		$this->data['stream']['total_posts'] = $this->streams->count_posts($title);
 		$this->data['stream']['is_following'] = $this->streams->is_following($this->data['user_id'], $title);
 		$this->data['stream']['is_subscribed'] = $this->streams->is_subscribed($this->data['user_id'], $title);
 		if($title == $this->data['user_id']) { $this->data['stream']['is_my_own'] = true; }
@@ -194,6 +243,7 @@ class Stream extends CI_Controller {
 
 		// Retrieve number of streams you are following
 		$this->data['stream']['following_num'] = $this->streams->count_following($this->data['user_id'], 'active');
+		$this->data['stream']['title'] = 'My Favorites';
 
 		// Retrieve an array of ids you are following
 		$following_ids = $this->streams->return_following($this->data['user_id'], 500, 0, 'active');
@@ -201,6 +251,10 @@ class Stream extends CI_Controller {
 
 		// Load the stream posts
 		$this->data['stream_posts'] = $this->streams->retrieve_favorites($this->data['user_id'], 10, 0);
+		// Calculate your total number of favorite posts
+		$this->db->from('favorites');
+		$this->db->where('user_id', $this->data['user_id']);
+		$this->data['stream']['total_posts'] = $this->db->count_all_results();
 
 		$this->load->view('my_stream', $this->data);
 	}

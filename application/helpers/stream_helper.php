@@ -63,3 +63,38 @@ if ( ! function_exists('generate_images_post'))
 	                    </div>';
     }
 }
+
+// Returns true if the user has permission to view a stream (false if they don't)
+if ( ! function_exists('permission_to_view'))
+{
+    function permission_to_view($user_id, $stream_id)
+    {
+    	// Get an instance reference
+    	$CI =& get_instance();
+
+    	// Get the stream access and subscription level
+    	$access_lvl = $CI->streams->stream_info($stream_id, 'access');
+
+    	// Find out if the user is following the stream already
+    	$is_following = $CI->streams->is_following($user_id, $stream_id);
+
+    	// Find out if the user is subscribed to the stream
+    	$is_subscribed = $CI->streams->is_subscribed($user_id, $stream_id);
+
+    	// Check to see if the user has permission to view this stream
+		// Must be logged into view restricted streams
+		if(($access_lvl == 'restricted') && (!$CI->data['is_logged_in'])) { return false; }
+
+		// Must be following to view private streams. Being subscribed overides not following. You can always view your own stream. Admins can always view streams.
+		if(($access_lvl == 'private') && ($is_following != 'active') && !$is_subscribed && ($stream_id != $user_id) && !$CI->data['admin'])
+		{
+			return false;
+		}
+    	return true;
+    }
+}
+
+
+
+
+

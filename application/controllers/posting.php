@@ -191,7 +191,7 @@ class Posting extends CI_Controller {
 			'author_id' => $this->data['user_id'],
 			'title' => $title,
 			'created_on' => $time,
-			'type' => 'link',
+			'type' => 'text',
 			'text' => $content
 			);
 		$this->db->insert('posts', $data);

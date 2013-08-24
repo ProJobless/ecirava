@@ -19,6 +19,7 @@ Include me on almost everypage!
 		    	<li><a href="/stream">My Stream</a></li>
 		    	<li><a href="/stream/favorites">Favorites</a></li>
 		    	<li><a href="/user">Account</a></li>
+		    	<li><a href="/posting">Post</a></li>
 		    	<li class="divider"></li>
 		    	<li><a href="/login/leave">Log Out</a></li>
 		    </ul>

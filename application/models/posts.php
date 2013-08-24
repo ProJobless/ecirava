@@ -231,7 +231,7 @@ class Posts extends CI_Model {
     // Counts the posts given certain parameters
     // Parameters given in key/value pair form or MySQL query form
     // Always returns an integer
-    function count_posts($param)
+    function count_posts($param='all')
     {
         if($param == 'all')
         {
@@ -396,6 +396,7 @@ class Posts extends CI_Model {
         $this->db->select('img');
         $this->db->from('images');
         $this->db->where('post_id', $post_id);
+        $this->db->order_by('id', 'asc');
         $images = $this->db->get();
 
         if($images->num_rows() == 1)
@@ -435,7 +436,7 @@ class Posts extends CI_Model {
         $post_array = array();
 
         foreach($posts as $post)
-        {      
+        {    
             // Format the poster's profile picture
             if($include_poster_pic)
             {
@@ -450,6 +451,8 @@ class Posts extends CI_Model {
             {
                 $repost_id = $post['repost_id'];
                 $reposted_icon = '<img class="repost_icon tooltip_me" data-html="true" data-placement="right" onmouseover="get_repost_author_pic(this, '.$post['repost_id'].')" src="/resources/img/repost.png" />';
+                // Display the correct number of comments
+                $post['num_comments'] = $this->posts->post_info($repost_id, 'num_comments');
             }
             else
             {
@@ -517,10 +520,10 @@ class Posts extends CI_Model {
             // The footer of each post
             $footer = '<div class="post_meta">
                                 <div class="pull-left"><a href="javascript:void(0)" onclick="show_comments(this, '.$repost_id.')" style="float:left">'.$post['num_comments'].' Comments</a></div>
-                                <div class="pull-right unselectable">'.$favorite_button.' '.$reblog_button.' <h4 onclick="comment(this, '.$post["id"].', 0)">Comment</h4></div>
+                                <div class="pull-right unselectable">'.$favorite_button.' '.$reblog_button.' <h4 onclick="comment(this, '.$repost_id.', 0)">Comment</h4></div>
                             </div>
                             <div style="clear:both;"></div>
-                            <div id="comments_'.$post["id"].'" class="comments">
+                            <div id="comments_'.$repost_id.'" class="comments">
                             </div>
                             <div class="load_comments">
                             </div>
@@ -533,7 +536,7 @@ class Posts extends CI_Model {
                             <div style="clear:both;"></div>
                         </div>
                     </div>'; 
-
+            $return_string = "";
             if($post['type'] == 'text')
             {
                 $return_string = generate_text_post($post, $pic, $reposted_icon);
@@ -567,6 +570,21 @@ class Posts extends CI_Model {
         if($this->db->count_all_results() == 1) { return true; }
         else { return false; }
     }
+
+    // Duplicated function
+    // // Returns a total count of users posts with an optional type filter
+    // function count_posts($user_id, $type='all')
+    // {
+    //     $this->db->from('posts');
+    //     $this->db->where('author_id', $user_id);
+
+    //     if($type != 'all')
+    //     {
+    //         $this->db->where('type', $type);
+    //     }
+
+    //     return $this->db->count_all_results();
+    // }
 }
 
 

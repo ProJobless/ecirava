@@ -95,36 +95,7 @@
 
     </script>
     <style>
-        .comment {
-            margin-left: 20px;
-        }
-        .comment img {
-            width: 100px;
-            height: 100px;
-            margin: 10px;
-            margin-bottom: 7px;
-            float: left;
-            cursor: pointer;
-            text-align: center;
-            border: 5px #FFF solid;
-        }
-        .comment .post_meta.date {
-            float: left;
-            margin: 0px;
-        }
-        .comment .post_meta.button {
-            float: right;
-            margin: 0px 15px;
-            cursor: pointer;
-
-        }
-        .comment .content {
-            min-height: 100px;
-            margin-left: 0px;   
-            color: #AAA;
-            padding: 7px;
-            margin-bottom: 0px;
-        }
+        
     </style>
 </html>
 

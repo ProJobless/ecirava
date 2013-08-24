@@ -31,11 +31,20 @@ class Comments extends CI_Model {
     }
 
     // Retrieves all the comment data as an array based on post ID 
+    // Returns the author's user name if $include_author_name is set to true
     // Returns an empty array on failure to find comment
-    function get_post_comments($post_id)
+    function get_post_comments($post_id, $include_author_name = false)
     {
         $this->db->from('comments');
         $this->db->where('post_id', $post_id);
+        if($include_author_name)
+        {
+            // Active Record throws a fit if you use table prefixes without this
+            $db['default']['_protect_identifiers'] = FALSE;
+            $this->db->join('users', 'users.id = comments.author_id');
+            $this->db->select('comments.*, users.username');
+        }
+
         $data = $this->db->get();
 
         if($data->num_rows() == 0) { return array(); }
